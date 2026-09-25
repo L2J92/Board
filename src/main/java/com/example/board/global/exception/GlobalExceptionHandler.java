@@ -87,4 +87,12 @@ public class GlobalExceptionHandler {
                         "서버 내부 오류가 발생했습니다."
                 ));
     }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateEmail(
+            DuplicateEmailException e
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("DUPLICATE_EMAIL", e.getMessage()));
+    }
 }
