@@ -1,0 +1,25 @@
+# IDE settings
+.idea/
+*.iml
+out/
+
+# Local Groovy SDK downloaded by the IDE
+/lib/groovy-*.jar
+
+# Gradle caches and build output
+**/.gradle/
+**/build/
+HELP.md
+
+# Local H2 database files
+**/data/*.mv.db
+**/data/*.trace.db
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db
