@@ -1,8 +1,8 @@
 package com.example.board.comment.domain;
 
+import com.example.board.global.exception.CommentDepthExceededException;
 import com.example.board.member.domain.Member;
 import com.example.board.post.domain.Post;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -66,7 +66,9 @@ public class Comment {
     }
 
     public static Comment create(String content,Post post, Member writer, Comment parent) {
-        if(parent.getParent() != null) throw new DuplicateRequestException("댓글의 댓글까지만 허용됩니다.");
+        if (parent.getParent() != null) {
+            throw new CommentDepthExceededException();
+        }
         return new Comment(content, post ,writer, parent);
     }
 
