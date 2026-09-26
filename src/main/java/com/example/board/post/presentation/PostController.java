@@ -3,6 +3,7 @@ package com.example.board.post.presentation;
 
 import com.example.board.post.application.PostService;
 import com.example.board.post.presentation.dto.CreatePostRequest;
+import com.example.board.post.presentation.dto.PostListResponse;
 import com.example.board.post.presentation.dto.PostResponse;
 import com.example.board.post.presentation.dto.UpdatePostRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +39,7 @@ public class PostController {
     }
 
     @GetMapping
-    public Page<PostResponse> getPosts(Pageable pageable) {
+    public Page<PostListResponse> getPosts(Pageable pageable) {
         return postService.getPosts(pageable);
     }
 
