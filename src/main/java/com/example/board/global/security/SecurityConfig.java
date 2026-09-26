@@ -1,5 +1,6 @@
 package com.example.board.global.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +11,16 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtTokenProvider jwtTokenProvider,
+            ObjectMapper objectMapper
+    ) throws Exception {
             http.csrf(AbstractHttpConfigurer::disable)
                     .formLogin(AbstractHttpConfigurer::disable)
                     .httpBasic(AbstractHttpConfigurer::disable)
@@ -43,6 +49,11 @@ public class SecurityConfig {
                                             new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
                                     )
                             );
+
+                    http.addFilterBefore(
+                      new JwtAuthenticationFilter(jwtTokenProvider, objectMapper),
+                      UsernamePasswordAuthenticationFilter.class
+                    );
 
                     return  http.build();
     }
