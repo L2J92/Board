@@ -45,6 +45,9 @@ public class Comment {
     @JoinColumn(name = "parent_id")
     private Comment parent;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean deleted = false;
+
     public Comment(String content, Post post, Member writer) {
         this.content = content;
         this.post = post;
@@ -65,6 +68,10 @@ public class Comment {
     public static Comment create(String content,Post post, Member writer, Comment parent) {
         if(parent.getParent() != null) throw new DuplicateRequestException("댓글의 댓글까지만 허용됩니다.");
         return new Comment(content, post ,writer, parent);
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 
     public void update(String content) {

@@ -33,7 +33,7 @@ public class CommentService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("member not found"));
 
-        Post post = postRepository.findById(postId).orElseThrow(() ->
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(() ->
                 new NotFoundException("post not found"));
 
         commentRepository.save(Comment.create(content, post, member));
@@ -45,10 +45,10 @@ public class CommentService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("member not found"));
 
-        Post post = postRepository.findById(postId).orElseThrow(() ->
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(() ->
                 new NotFoundException("post not found"));
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+        Comment comment = commentRepository.findByIdAndDeletedFalseAndPost_DeletedFalse(commentId).orElseThrow(() ->
                 new NotFoundException("comment not found"));
 
         if(!comment.getPost().getId().equals(postId)) {
@@ -61,6 +61,9 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getComments(Long postId) {
+        if (!postRepository.existsByIdAndDeletedFalse(postId)) {
+            throw new NotFoundException("post not found");
+        }
         List<Comment> comments =
                 commentRepository.findAllByPost_IdOrderByCreatedAtAscIdAsc(postId);
 
@@ -87,7 +90,7 @@ public class CommentService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("member not found"));
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+        Comment comment = commentRepository.findByIdAndDeletedFalseAndPost_DeletedFalse(commentId).orElseThrow(() ->
                 new NotFoundException("comment not found"));
 
         if (!comment.getWriter().getId().equals(member.getId())) {
@@ -103,13 +106,13 @@ public class CommentService {
         Member member = memberRepository.findById(memberId).orElseThrow(() ->
                 new NotFoundException("member not found"));
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
+        Comment comment = commentRepository.findByIdAndDeletedFalseAndPost_DeletedFalse(commentId).orElseThrow(() ->
                 new NotFoundException("comment not found"));
 
         if (!comment.getWriter().getId().equals(member.getId())) {
             throw new AccessDeniedException("작성자만 수정·삭제할 수 있습니다.");
         }
 
-        commentRepository.delete(comment);
+        comment.delete();
     }
 }

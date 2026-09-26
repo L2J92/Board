@@ -37,6 +37,7 @@ public class Post {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean deleted = false;
 
     public Post(String title, String content, Member writer) {
@@ -47,6 +48,10 @@ public class Post {
 
     public static Post create(String title, String content, Member writer) {
         return new Post(title, content, writer);
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 
     public void update(String title, String content) {

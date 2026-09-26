@@ -33,7 +33,7 @@ public class PostService {
 
     @Transactional
     public PostResponse getPost(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() ->
+        Post post = postRepository.findByIdAndDeletedFalse(id).orElseThrow(() ->
                 new NotFoundException("post not found")
         );
 
@@ -42,7 +42,7 @@ public class PostService {
 
     @Transactional
     public Page<PostResponse> getPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).map(PostResponse::from);
+        return postRepository.findAllByDeletedFalse(pageable).map(PostResponse::from);
     }
 
     @Transactional
@@ -51,11 +51,11 @@ public class PostService {
                 () -> new NotFoundException("member not found")
         );
 
-        Post post = postRepository.findById(postId).orElseThrow(
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(
                 () -> new NotFoundException("post not found")
         );
 
-        if (!post.getWriter().equals(member)) {
+        if (!post.getWriter().getId().equals(member.getId())) {
             throw new AccessDeniedException("작성자만 수정·삭제할 수 있습니다.");
         }
 
@@ -68,15 +68,15 @@ public class PostService {
                 new NotFoundException("member not found")
         );
 
-        Post post = postRepository.findById(postId).orElseThrow(() ->
+        Post post = postRepository.findByIdAndDeletedFalse(postId).orElseThrow(() ->
                 new NotFoundException("post not found")
         );
 
-        if (!post.getWriter().equals(member)) {
+        if (!post.getWriter().getId().equals(member.getId())) {
             throw new AccessDeniedException("작성자만 수정·삭제할 수 있습니다.");
         }
 
-        postRepository.deleteById(postId);
+        post.delete();
 
     }
 }
