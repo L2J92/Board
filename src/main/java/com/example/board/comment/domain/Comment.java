@@ -2,10 +2,13 @@ package com.example.board.comment.domain;
 
 import com.example.board.member.domain.Member;
 import com.example.board.post.domain.Post;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,17 +20,22 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private int id;
+    private Long id;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private final LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private Post board;
+    @JoinColumn(name = "post_id")
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -36,4 +44,30 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Comment parent;
+
+    public Comment(String content, Post post, Member writer) {
+        this.content = content;
+        this.post = post;
+        this.writer = writer;
+    }
+
+    public Comment(String content, Post post, Member writer, Comment parent) {
+        this.content = content;
+        this.post = post;
+        this.writer = writer;
+        this.parent = parent;
+    }
+
+    public static Comment create(String content,Post post, Member writer) {
+        return new Comment(content, post ,writer);
+    }
+
+    public static Comment create(String content,Post post, Member writer, Comment parent) {
+        if(parent.getParent() != null) throw new DuplicateRequestException("댓글의 댓글까지만 허용됩니다.");
+        return new Comment(content, post ,writer, parent);
+    }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }
